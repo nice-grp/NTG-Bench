@@ -1,0 +1,25 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE settings
+.DS_Store
+.idea/
+.vscode/
+
+# Benchmark outputs
+outputs/
+
+# Local configs and notebooks
+*.log
+*.tmp
+*.ipynb_checkpoints
