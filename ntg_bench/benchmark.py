@@ -203,6 +203,7 @@ class BenchmarkRunner:
         baseline_results: Dict[str, Dict[str, float]] = {}
         tstr_df = pd.DataFrame(index=["real"] + list(self.config.models))
 
+  
         for name, model in ml_models.items():
             metrics = evaluate_classifier(
                 model,
@@ -225,8 +226,31 @@ class BenchmarkRunner:
             if syn_df.empty:
                 LOGGER.warning("Skipping TSTR evaluation for %s (no synthetic data).", model_name)
                 continue
-            sample_size = min(len(real_train_df), len(syn_df))
-            gen_train_df = syn_df.sample(n=sample_size, random_state=self.config.random_state)
+            
+   
+            for col in self.config.categorical_features:
+                if col in syn_df.columns:
+                    syn_df[col] = syn_df[col].astype(str)
+
+           
+            tstr_train_parts = []
+            for class_label in real_train_df[self.config.label_column].unique():
+                n_samples_needed = len(real_train_df[real_train_df[self.config.label_column] == class_label])
+   
+                syn_class_df = syn_df[syn_df[self.config.label_column] == class_label]
+                
+                n_to_sample = min(n_samples_needed, len(syn_class_df))
+                
+                if n_to_sample > 0:
+                    samples = syn_class_df.sample(n=n_to_sample, random_state=self.config.random_state)
+                    tstr_train_parts.append(samples)
+
+            if not tstr_train_parts:
+                LOGGER.warning("Not enough synthetic data for TSTR evaluation of %s.", model_name)
+                continue
+                
+            gen_train_df = pd.concat(tstr_train_parts, ignore_index=True)
+            
             X_gen_train = gen_train_df.drop(columns=[self.config.label_column])
             y_gen_train = label_encoder.transform(gen_train_df[self.config.label_column])
 
