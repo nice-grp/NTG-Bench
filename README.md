@@ -6,10 +6,10 @@ NTG-Bench is an implementation of the evaluation framework proposed in the paper
 
 The framework evaluates synthetic traffic along five complementary axes:
 
-1. **Distribution Similarity** – Captures how well marginal feature distributions are preserved via Jensen–Shannon divergence (JSD), total variation distance (TVD), Earth mover’s distance (EMD), and the Kolmogorov–Smirnov (KS) statistic.
+1. **Distribution Similarity** – Measures preservation of individual feature distributions (JSD, TVD, EMD, KS) and feature interdependencies (PCD, CMD), with lower values indicating better similarity.
 2. **Protocol Compliance** – Applies the deterministic knowledge checks (DKC) from the paper to flag impossible flows (e.g., TCP on DNS-only ports) and reports the clean-pass ratio alongside the filtered dataset.
-3. **Semantic Consistency** – Measures whether inter-feature relationships are retained using the categorical mutual dependence (CMD) metric and Pearson correlation distance (PCD) on continuous features.
-4. **Generation Diversity** – Uses the PRDC density/coverage scores over a one-hot + min–max representation to quantify whether the synthetic set covers real operating modes instead of collapsing to a narrow region.
+3. **Semantic Consistency** – Quantifies preservation of attack characteristics by verifying key metrics fall within valid ranges derived from real data, calculated as semantic consistency rate (SCR).
+4. **Generation Diversity** – Uses PRDC coverage scores to ensure synthetic data covers real operating modes.
 5. **End-to-End Utility** – Benchmarks the usefulness of synthetic traffic for downstream detection by training several classical classifiers (DT, RF, GB, XGB, MLP) in three scenarios: pure real data (baseline), train-on-synthetic-test-on-real (TSTR), mixed synthetic/real ratios, and data augmentation strategies.
 
 All metrics are reported as CSV artifacts that can be version-controlled or ingested into downstream dashboards.
@@ -28,7 +28,7 @@ All metrics are reported as CSV artifacts that can be version-controlled or inge
 │   ├── metrics.py           # Metric implementations
 │   ├── protocol.py          # DKC / protocol compliance checks
 │   └── utility.py           # Task utility evaluation helpers
-├── paper.pdf                # Reference paper
+├── config.example.json      # config example
 └── requirements.txt         # Python dependencies
 ```
 
@@ -79,7 +79,7 @@ All runtime options live in a JSON file to keep experiments reproducible. Start 
 ```json
 {
   "base_dir": "/absolute/path/to/data",
-  "models": ["NetShare", "FlowGAN"],
+  "models": ["NetShare"],
   "classes": ["Bruteforce", "WebAttack", "DDoS"],
   "continuous_features": ["td", "pkt", "byt"],
   "categorical_features": ["proto", "service"],

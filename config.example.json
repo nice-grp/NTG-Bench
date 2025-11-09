@@ -1,16 +1,16 @@
 {
-  "base_dir": "/path/to/benchmark/data",
+  "base_dir": "/absolute/path/to/data",
   "models": ["NetShare"],
-  "classes": ["Bruteforce"],
-  "continuous_features": ["td"],
-  "categorical_features": ["proto"],
+  "classes": ["Bruteforce", "WebAttack", "DDoS"],
+  "continuous_features": ["td", "pkt", "byt"],
+  "categorical_features": ["proto", "service"],
   "label_column": "label",
   "real_data_name": "real",
   "real_train_subdir": "real_train",
   "real_test_subdir": "real_test",
   "output_dir": "outputs",
   "random_state": 42,
-  "mixing_rates": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  "mixing_rates": [0.0, 0.25, 0.5, 0.75, 1.0],
   "augment_strategy": "self",
   "augment_target_count": 16000
 }

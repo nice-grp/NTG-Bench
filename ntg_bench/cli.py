@@ -36,3 +36,6 @@ def main() -> None:
     config = BenchmarkConfig.from_json(args.config)
     runner = BenchmarkRunner(config)
     runner.run()
+    
+if __name__ == "__main__":
+    main()

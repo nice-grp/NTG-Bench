@@ -29,9 +29,7 @@ else:
 def get_default_models(random_state: int) -> Dict[str, object]:
     models = {
         "DT": DecisionTreeClassifier(random_state=random_state),
-        "RF": RandomForestClassifier(random_state=random_state, n_jobs=-1),
         "GB": GradientBoostingClassifier(random_state=random_state),
-        "MLP": MLPClassifier(random_state=random_state, max_iter=100),
     }
     if xgboost_available:
         models["XGB"] = xgb.XGBClassifier(

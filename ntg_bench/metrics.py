@@ -159,7 +159,7 @@ def _one_hot(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
     return pd.concat(encoded, axis=1)
 
 
-def compute_density_coverage(
+def compute_coverage(
     real: pd.DataFrame, synthetic: pd.DataFrame, threshold: int = 40, neighbors: int = 5
 ) -> Tuple[float, float]:
     merged = pd.concat([real, synthetic], axis=0).reset_index(drop=True)
@@ -173,4 +173,4 @@ def compute_density_coverage(
     syn_scaled = scaler.transform(syn_values)
 
     prdc_scores = compute_prdc(real_scaled, syn_scaled, neighbors)
-    return float(prdc_scores["density"]), float(prdc_scores["coverage"])
+    return float(prdc_scores["coverage"])

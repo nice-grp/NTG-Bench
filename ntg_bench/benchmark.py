@@ -12,7 +12,7 @@ from .config import BenchmarkConfig
 from .data import ensure_directory, load_and_label_data
 from .metrics import (
     compute_cmd,
-    compute_density_coverage,
+    compute_coverage,
     compute_emd,
     compute_jsd,
     compute_ks,
@@ -83,7 +83,6 @@ class BenchmarkRunner:
                 "KS": [],
                 "CMD": [],
                 "PCD": [],
-                "Density": [],
                 "Coverage": [],
                 "DKC": [],
             }
@@ -154,8 +153,7 @@ class BenchmarkRunner:
                     )
 
                 per_metric_scores["CMD"].append(compute_cmd(real_cat, syn_cat))
-                density, coverage = compute_density_coverage(real_all, syn_all)
-                per_metric_scores["Density"].append(density)
+                coverage = compute_coverage(real_all, syn_all)
                 per_metric_scores["Coverage"].append(coverage)
 
             summary = {"Model": model_name}
@@ -183,6 +181,11 @@ class BenchmarkRunner:
 
     def _run_task_utility(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         real_train_df, real_test_df = self._load_real_datasets()
+        for col in self.config.categorical_features:
+            if col in real_train_df.columns:
+                real_train_df[col] = real_train_df[col].astype(str)
+            if col in real_test_df.columns:
+                real_test_df[col] = real_test_df[col].astype(str)
         label_encoder = LabelEncoder()
         label_encoder.fit(
             pd.concat(
@@ -248,6 +251,12 @@ class BenchmarkRunner:
         label_encoder = LabelEncoder()
         label_encoder.fit(real_train_df[self.config.label_column])
 
+        for col in self.config.categorical_features:
+            if col in real_train_df.columns:
+                real_train_df[col] = real_train_df[col].astype(str)
+            if col in real_test_df.columns:
+                real_test_df[col] = real_test_df[col].astype(str)
+
         X_real_test = real_test_df.drop(columns=[self.config.label_column])
         y_real_test = label_encoder.transform(real_test_df[self.config.label_column])
         ml_models = get_default_models(self.config.random_state)
@@ -260,6 +269,10 @@ class BenchmarkRunner:
             )
             if syn_df.empty:
                 continue
+
+            for col in self.config.categorical_features:
+                if col in syn_df.columns:
+                    syn_df[col] = syn_df[col].astype(str)
 
             for rate in self.config.mixing_rates:
                 mixed_frames = []
@@ -322,6 +335,12 @@ class BenchmarkRunner:
         label_encoder.fit(real_train_df[self.config.label_column])
         ml_models = get_default_models(self.config.random_state)
 
+        for col in self.config.categorical_features:
+            if col in real_train_df.columns:
+                real_train_df[col] = real_train_df[col].astype(str)
+            if col in real_test_df.columns:
+                real_test_df[col] = real_test_df[col].astype(str)
+
         X_real_test = real_test_df.drop(columns=[self.config.label_column])
         y_real_test = label_encoder.transform(real_test_df[self.config.label_column])
 
@@ -342,6 +361,10 @@ class BenchmarkRunner:
             )
             if syn_df.empty:
                 continue
+
+            for col in self.config.categorical_features:
+                if col in syn_df.columns:
+                    syn_df[col] = syn_df[col].astype(str)
 
             augmented_frames = [real_train_df]
             for class_label, current_count in class_counts.items():
